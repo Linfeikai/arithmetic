@@ -5,7 +5,7 @@ ops_rule = {
     '+': 1,
     '-': 1,
     '*': 2,
-    '/': 2
+    '÷': 2
 }
 
 
@@ -42,7 +42,7 @@ def middle_to_after(s):
     ops = []
     ss = s.split(' ')
     for item in ss:
-        if item in ['+', '-', '*', '/']:  # 操作符
+        if item in ['+', '-', '*', '÷']:  # 操作符
             while len(ops) >= 0:
                 if len(ops) == 0:
                     # 此时操作符栈里没有其他的运算符号，这是第一个运算符号，入栈
@@ -71,6 +71,8 @@ def middle_to_after(s):
     while len(ops) > 0:
         expression.append(ops.pop())
 
+    print('现在的后继表达式',expression)
+
     return expression
 
 
@@ -78,6 +80,7 @@ class Problem():
     '''存储每一道问题的类'''
 
     def __init__(self, expression=None, isValid=True, answer=''):
+        self.isValid = True
         print('A blank pro has been generated.')
 
     # 用来生成问题
@@ -107,11 +110,14 @@ class Problem():
         problem = problem + str(numList[len(numList) - 1])
         # print('我生成的问题是：',problem)
         self.description = problem
-
+    #生成之后self.description = '1+2÷4这种的。'
     # 用来计算答案
     def caculate(self):
         expression = middle_to_after(self.description)
         self.answer = self.expression_to_value(expression)
+        #把类似11.0 12.0的数转换成整数
+        if(isinstance(self.answer,float)):
+            self.answer = int(self.answer)
 
     # 用来计算答案
 
@@ -127,6 +133,8 @@ class Problem():
                 n2 = stack_value.pop()  # 注意，先出栈的在操作符右边.
                 n1 = stack_value.pop()
                 result = self.cal(n1, n2, item)
+                if(self.isValid == False):
+                    return
                 stack_value.append(result)
             elif ('/' in item):
                 # 如果压入的是分数
@@ -145,16 +153,26 @@ class Problem():
             return n1 - n2
         if op == '*':
             return n1 * n2
-        if op == '/':
-            if (n2 == 0 or n1 > n2):
+        if op == '÷':
+            if (n2 == 0):
                 self.isValid = False
-            return n1 / n2
+                return
+            else:
+                return n1 / n2
 
 
 mypro = Problem()
+#初始化实例的时候.isValid默认是True 调用makeP和caculate后再判断isValid是否为True 如果是说明这个算式符合要求，如果不是要重新调用这两个方法
 mypro.makeProblem()
+# mypro.description='9 - 1/4 * 1/10'
 mypro.caculate()
-print('我生成的问题是',mypro.description,'这个问题的答案是：' ,mypro.answer)
+while(mypro.isValid == False):
+    mypro.isValid = True
+    mypro.makeProblem()
+    mypro.caculate()
+print('我生成的问题是',mypro.description,'这个问题的答案是：' ,mypro.answer,mypro.isValid)
+
+
 
 # myPro = Problem(1,2,3)
 # myPro.makeProblem()

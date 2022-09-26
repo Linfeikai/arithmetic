@@ -21,8 +21,8 @@ def generateNum():
        numerator = random.randint(denominator, denominator*3)
        frac = Fraction(numerator, denominator)
        return frac
-
-def middleToAfter():
+#把中继表达式转换成后继表达式
+# def middleToAfter():
 
 
 #随机生成一个小数 0~1之间
@@ -62,7 +62,7 @@ print("这个运算符号是：",selectedSign)
 problem = ':'
 # 现在我有两个元组 一个元组里面有n个元素 另一个元组里有n-1个元素 我要把这两个元组的元素依次读出来
 for a in range(0,len(selectedSign)):
-    problem = problem + str(numList[a]) + selectedSign[a]
+    problem = problem + str(numList[a]) + ' ' +selectedSign[a] + ' '
 problem = problem + str(numList[len(numList)-1])
 print(problem)
 #
@@ -75,3 +75,6 @@ print(problem)
 # e = Fraction(f,d)
 # print(e)
 #加法
+a = Fraction('4/5')
+print(type(a))
+print(a)

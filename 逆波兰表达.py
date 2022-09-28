@@ -85,7 +85,7 @@ def cal(n1, n2, op):
         return n1 / n2
 
 
-s = '4 + 1/2 + 3/2 * 2'
+s = '5 / 4 * 2 - 15/8'
 answer = middle_to_after(s)
 answer2 = expression_to_value(answer)
 print(answer)

@@ -75,6 +75,13 @@ def middle_to_after(s):
 
     return expression
 
+def change(answer):
+    if(answer > 1):
+        int1 = int(answer)
+        decimal = answer - int1
+        final_Answer = str(int1) + "'" + str(decimal)
+    return final_Answer
+
 
 class Problem():
     '''存储每一道问题的类'''
@@ -117,7 +124,10 @@ class Problem():
         self.answer = self.expression_to_value(expression)
         #把类似11.0 12.0的数转换成整数
         if(isinstance(self.answer,float)):
-            self.answer = int(self.answer)
+            if(self.answer.is_integer()):
+                self.answer = int(self.answer)
+            else:
+                self.answer = Fraction(self.answer)
 
     # 用来计算答案
 
@@ -163,14 +173,21 @@ class Problem():
 
 mypro = Problem()
 #初始化实例的时候.isValid默认是True 调用makeP和caculate后再判断isValid是否为True 如果是说明这个算式符合要求，如果不是要重新调用这两个方法
-mypro.makeProblem()
-# mypro.description='9 - 1/4 * 1/10'
+# mypro.makeProblem()
+mypro.description='5 ÷ 4 * 2 - 15/8'
 mypro.caculate()
 while(mypro.isValid == False):
     mypro.isValid = True
     mypro.makeProblem()
     mypro.caculate()
+
+a = Fraction(9,8)
+b = change(a)
+print(b)
+
+
 print('我生成的问题是',mypro.description,'这个问题的答案是：' ,mypro.answer,mypro.isValid)
+
 
 
 

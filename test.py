@@ -59,7 +59,7 @@ selectedSign = random.sample(signList,sign)
 print("这个运算符号是：",selectedSign)
 
 #计算结果
-problem = ':'
+problem = ''
 # 现在我有两个元组 一个元组里面有n个元素 另一个元组里有n-1个元素 我要把这两个元组的元素依次读出来
 for a in range(0,len(selectedSign)):
     problem = problem + str(numList[a]) + ' ' +selectedSign[a] + ' '
@@ -75,6 +75,3 @@ print(problem)
 # e = Fraction(f,d)
 # print(e)
 #加法
-a = Fraction('4/5')
-print(type(a))
-print(a)

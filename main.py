@@ -12,9 +12,9 @@ ops_rule = {
 # 用来生成数字
 def generateNum():
     # 对每一个要运算的数，它是整数、带分数、真分数的概率是相等的。
-    a = random.randint(0, 2)
+    a = random.randint(0, 3)
     # 生成整数
-    if (a == 0):
+    if (a == 0 or a == 3):
         return (random.randint(0, 9))
     # 生成小数
     elif (a == 1):
@@ -86,10 +86,10 @@ def formattedAnswer(answer):
             finalAnswer = int(answer)
         else:
             #答案是诸如3.2 5.6的数 转化成分数
-            finalAnswer = Fraction(answer)
+            finalAnswer = str(Fraction(answer))
     #答案是假分数
     if (finalAnswer > 1):
-        if(isinstance(finalAnswer,Fraction)):
+        if(isinstance(finalAnswer,Fraction) and (finalAnswer.denominator != 1)):
             int1 = int(answer)
             decimal = answer - int1
             finalAnswer = str(int1) + "'" + str(decimal)
@@ -101,11 +101,14 @@ def formatPro(question):
     # 把问题分开 得到一个list
     ques = question.split(' ')
     # 这个循环把list里的假分数换成带分数
-    for item in ques:
-        if ('/' in item):
-            item = Fraction(item)
-            if (item > 1):
-                item = formattedAnswer(item)
+    #传入引用还是传入地址？
+    for i in range(0,len(ques)):
+        if ('/' in ques[i]):
+            ques[i] = Fraction(ques[i])
+            if (ques[i] > 1):
+                ques[i] = formattedAnswer(ques[i])
+            #只要是分数 全部转化成 字符串 这里是为了下面两行的拼接
+            ques[i] = str(ques[i])
     formatted = ''.join(ques)
     finalFormatted = formatted + '='
     return finalFormatted
@@ -230,6 +233,9 @@ mypro.makeProblem()
 # mypro.description='3/2 * 9/4 - 2 ÷ 6'
 # mypro.description='28/19 + 2 ÷ 9'
 # mypro.description='1 ÷ 2 - 1/12 * 24/13'
+# mypro.description = '6 ÷ 12/7 * 2 * 3'
+# mypro.description='13/6 * 1 - 23/15'
+# mypro.description = '5 * 11/7 + 8/13'
 mypro.caculate()
 while (mypro.isValid == False):
     mypro.isValid = True

@@ -71,16 +71,33 @@ def middle_to_after(s):
     while len(ops) > 0:
         expression.append(ops.pop())
 
-    print('现在的后继表达式',expression)
+    print('现在的后继表达式', expression)
 
     return expression
 
+
+# 把假分数换成带分数
 def change(answer):
-    if(answer > 1):
+    if (answer > 1):
         int1 = int(answer)
         decimal = answer - int1
         final_Answer = str(int1) + "'" + str(decimal)
     return final_Answer
+
+
+# 把问题进行格式化
+def formatPro(question):
+    # 把问题分开 得到一个list
+    ques = question.split(' ')
+    # 这个循环把list里的假分数换成带分数
+    for item in ques:
+        if ('/' in item):
+            item = Fraction(item)
+            if (item > 1):
+                item = change(item)
+    formatted = ''.join(ques)
+    finalFormatted = formatted + '='
+    return finalFormatted
 
 
 class Problem():
@@ -117,21 +134,22 @@ class Problem():
         problem = problem + str(numList[len(numList) - 1])
         # print('我生成的问题是：',problem)
         self.description = problem
-    #生成之后self.description = '1+2÷4这种的。'
+
+    # 生成之后self.description = '1+2÷4这种的。'
     # 用来计算答案
     def caculate(self):
         expression = middle_to_after(self.description)
         self.answer = self.expression_to_value(expression)
-        #把类似11.0 12.0的数转换成整数
-        if(isinstance(self.answer,float)):
-            if(self.answer.is_integer()):
+        # 把类似11.0 12.0的数转换成整数
+        if (isinstance(self.answer, float)):
+            if (self.answer.is_integer()):
                 self.answer = int(self.answer)
             else:
                 self.answer = Fraction(self.answer)
 
     # 用来计算答案
 
-    def expression_to_value(self,expression):
+    def expression_to_value(self, expression):
         """
         :param expression: 后缀表达式的字符串表示，操作符跟数值间用空格分割，例如：
         "9 3 1 - 3 * + 10 2 / +"
@@ -143,7 +161,7 @@ class Problem():
                 n2 = stack_value.pop()  # 注意，先出栈的在操作符右边.
                 n1 = stack_value.pop()
                 result = self.cal(n1, n2, item)
-                if(self.isValid == False):
+                if (self.isValid == False):
                     return
                 stack_value.append(result)
             elif ('/' in item):
@@ -172,24 +190,19 @@ class Problem():
 
 
 mypro = Problem()
-#初始化实例的时候.isValid默认是True 调用makeP和caculate后再判断isValid是否为True 如果是说明这个算式符合要求，如果不是要重新调用这两个方法
-# mypro.makeProblem()
-mypro.description='5 ÷ 4 * 2 - 15/8'
+# 初始化实例的时候.isValid默认是True 调用makeP和caculate后再判断isValid是否为True 如果是说明这个算式符合要求，如果不是要重新调用这两个方法
+mypro.makeProblem()
+# mypro.description='5 ÷ 4 * 2 - 15/8'
 mypro.caculate()
-while(mypro.isValid == False):
+while (mypro.isValid == False):
     mypro.isValid = True
     mypro.makeProblem()
     mypro.caculate()
+if (mypro.answer > 1):
+    mypro.answer = change(mypro.answer)
+mypro.description = formatPro(mypro.description)
 
-a = Fraction(9,8)
-b = change(a)
-print(b)
-
-
-print('我生成的问题是',mypro.description,'这个问题的答案是：' ,mypro.answer,mypro.isValid)
-
-
-
+print('我生成的问题是', mypro.description, '这个问题的答案是：', mypro.answer, mypro.isValid)
 
 # myPro = Problem(1,2,3)
 # myPro.makeProblem()

@@ -1,5 +1,7 @@
 import random
 from fractions import Fraction
+import argparse
+import sys
 
 ops_rule = {
     '+': 1,
@@ -10,12 +12,12 @@ ops_rule = {
 
 
 # 用来生成数字
-def generateNum():
+def generateNum(maxNum):
     # 对每一个要运算的数，它是整数、带分数、真分数的概率是相等的。
     a = random.randint(0, 3)
     # 生成整数
     if (a == 0 or a == 3):
-        return (random.randint(0, 9))
+        return (random.randint(0, maxNum))
     # 生成小数
     elif (a == 1):
         denominator = random.randint(2, 20)
@@ -105,10 +107,12 @@ def formatPro(question):
     #传入引用还是传入地址？
     for i in range(0,len(ques)):
         if ('/' in ques[i]):
+            # 把字符串转换成分数
             ques[i] = Fraction(ques[i])
+            # 判断这个分数是不是假分数
             if (ques[i] > 1):
                 ques[i] = formattedAnswer(ques[i])
-            #只要是分数 全部转化成 字符串 这里是为了下面两行的拼接
+            #只要是分数 全部转化成 字符串 这里是为了拼接
         ques[i] = str(ques[i]) + ' '
     formatted = ''.join(ques)
     finalFormatted = formatted + '='
@@ -118,8 +122,9 @@ def formatPro(question):
 class Problem():
     '''存储每一道问题的类'''
 
-    def __init__(self, expression=None, isValid=True, answer=''):
+    def __init__(self, expression=None, isValid=True, answer='', maxNumber = None):
         self.isValid = True
+        self.maxNumber = None
         print('A blank pro has been generated.')
 
     # 生成问题
@@ -130,7 +135,7 @@ class Problem():
         # 生成这几个随机数 因为number等于3 所以要执行三次generate函数 把结果放在一个元组里面。
         numList = []
         for i in range(0, numbers):
-            numList.append(generateNum())
+            numList.append(generateNum(self.maxNumber))
         # print('这些数字是：', numList)
 
         # 运算符号的个数等于随机数字个数减一
@@ -228,31 +233,45 @@ class Problem():
                 return n1 / n2
 
 
-mypro = Problem()
-# 初始化实例的时候.isValid默认是True 调用makeP和caculate后再判断isValid是否为True 如果是说明这个算式符合要求，如果不是要重新调用这两个方法
-# mypro.makeProblem()
-# mypro.description='3/2 * 9/4 - 2 ÷ 6'
-# mypro.description='28/19 + 2 ÷ 9'
-# mypro.description='1 ÷ 2 - 1/12 * 24/13'
-# mypro.description = '6 ÷ 12/7 * 2 * 3'
-# mypro.description='13/6 * 1 - 23/15'
-# mypro.description = '5 * 11/7 + 8/13'
-# mypro.description = '9 ÷ 3 - 4/7'
-# mypro.caculate()
-# while (mypro.isValid == False):
-#     mypro.isValid = True
-#     mypro.makeProblem()
-#     mypro.caculate()
-# mypro.description = formatPro(mypro.description)
+if __name__ =='__main__':
+    # 在参数帮助文档之前显示的文本
+    parser = argparse.ArgumentParser(description='Read the following instructions.')
 
-# print('我生成的问题是', mypro.description, '这个问题的答案是：', mypro.answer, mypro.isValid)
+    #输入默认是str类型的
+    # 可选参数 生成题目数量 默认生成100道
+    parser.add_argument('-n',help="输入生成题目数量(可选)",type=int,default=10)
+    # 必选参数  题目的数值范围
+    parser.add_argument("-r",help="输入数值最大值(>0,必选)",type=float,default=20)
+    args = parser.parse_args()
+    if(args.r < 0):
+        print('输入值非法。请重新输入')
+        sys.exit()
+    print('wwwww')
 
-for i in range(0,10):
-    mypro.makeProblem()
-    mypro.caculate()
-    mypro.description = formatPro(mypro.description)
-    while (mypro.isValid == False):
-        mypro.isValid = True
+    numuberOfPro = args.n
+    rangeOfNum = args.r
+    # print(type(rangeOfNum))
+    # print(rangeOfNum)
+
+    # 帮过我debug的算式们：（谨以注释留念）
+    # mypro.description='3/2 * 9/4 - 2 ÷ 6'
+    # mypro.description='28/19 + 2 ÷ 9'
+    # mypro.description='1 ÷ 2 - 1/12 * 24/13'
+    # mypro.description = '6 ÷ 12/7 * 2 * 3'
+    # mypro.description='13/6 * 1 - 23/15'
+    # mypro.description = '5 * 11/7 + 8/13'
+    # mypro.description = '9 ÷ 3 - 4/7'
+    mypro = Problem()
+    mypro.maxNumber = rangeOfNum
+    for i in range(0,numuberOfPro):
         mypro.makeProblem()
         mypro.caculate()
-    print('我生成的问题是', mypro.description, '这个问题的答案是：', mypro.answer, mypro.isValid)
+        mypro.description = formatPro(mypro.description)
+        while (mypro.isValid == False):
+            '''初始化实例的时候.isValid默认是True 调用makeP和caculate后再判断isValid是否为True 如果是说明这个算式符合要求，
+                如果不是要重新调用这两个方法'''
+            mypro.isValid = True
+            mypro.makeProblem()
+            mypro.caculate()
+            mypro.description = formatPro(mypro.description)
+        print('我生成的问题是', mypro.description, '这个问题的答案是：', mypro.answer, mypro.isValid)

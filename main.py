@@ -71,7 +71,7 @@ def middle_to_after(s):
     while len(ops) > 0:
         expression.append(ops.pop())
 
-    print('现在的后继表达式', expression)
+    # print('现在的后继表达式', expression)
 
     return expression
 
@@ -86,12 +86,13 @@ def formattedAnswer(answer):
             finalAnswer = int(answer)
         else:
             #答案是诸如3.2 5.6的数 转化成分数
-            finalAnswer = str(Fraction(answer))
+            finalAnswer = Fraction(answer).limit_denominator(100)
     #答案是假分数
     if (finalAnswer > 1):
         if(isinstance(finalAnswer,Fraction) and (finalAnswer.denominator != 1)):
             int1 = int(answer)
-            decimal = answer - int1
+            # decimal = round(answer - int1,3)
+            decimal = Fraction(answer-int1).limit_denominator(100)
             finalAnswer = str(int1) + "'" + str(decimal)
     return finalAnswer
 
@@ -108,7 +109,7 @@ def formatPro(question):
             if (ques[i] > 1):
                 ques[i] = formattedAnswer(ques[i])
             #只要是分数 全部转化成 字符串 这里是为了下面两行的拼接
-            ques[i] = str(ques[i])
+        ques[i] = str(ques[i]) + ' '
     formatted = ''.join(ques)
     finalFormatted = formatted + '='
     return finalFormatted
@@ -121,24 +122,24 @@ class Problem():
         self.isValid = True
         print('A blank pro has been generated.')
 
-    # 用来生成问题
+    # 生成问题
     def makeProblem(self):
         # 随机数字的个数
         numbers = random.randint(2, 4)
-        print('这个题目里有%d个数字' % numbers)
+        # print('这个题目里有%d个数字' % numbers)
         # 生成这几个随机数 因为number等于3 所以要执行三次generate函数 把结果放在一个元组里面。
         numList = []
         for i in range(0, numbers):
             numList.append(generateNum())
-        print('这些数字是：', numList)
+        # print('这些数字是：', numList)
 
         # 运算符号的个数等于随机数字个数减一
         sign = numbers - 1
-        print('这个题目里有%d个运算符号' % sign)
+        # print('这个题目里有%d个运算符号' % sign)
         # 随机符号有哪些？
         signList = ['+', '-', '*', '÷','+','*']
         selectedSign = random.sample(signList, sign)
-        print("这个运算符号是：", selectedSign)
+        # print("这个运算符号是：", selectedSign)
 
         # 计算结果
         problem = ''
@@ -148,9 +149,9 @@ class Problem():
         problem = problem + str(numList[len(numList) - 1])
         # print('我生成的问题是：',problem)
         self.description = problem
-
     # 生成之后self.description = '1+2÷4这种的。'
-    # 用来计算答案
+
+    # 计算答案
     def caculate(self):
 
         #生成后继表达式
@@ -201,7 +202,7 @@ class Problem():
                 stack_value.append(item)  # 数值直接压栈.
             else:
                 stack_value.append(int(item))
-        initialAnswer = stack_value[0]
+        # initialAnswer = stack_value[0]
 
         return stack_value[0]
 
@@ -222,30 +223,36 @@ class Problem():
                 return
             # 如果是整数/整数 应该返回分数
             elif(n1%n2!=0 and isinstance(n1,int) and isinstance(n2,int)):
-                return (Fraction(n1,n2))
+                return (Fraction(n1,n2).limit_denominator(100))
             else:
                 return n1 / n2
 
 
 mypro = Problem()
 # 初始化实例的时候.isValid默认是True 调用makeP和caculate后再判断isValid是否为True 如果是说明这个算式符合要求，如果不是要重新调用这两个方法
-mypro.makeProblem()
+# mypro.makeProblem()
 # mypro.description='3/2 * 9/4 - 2 ÷ 6'
 # mypro.description='28/19 + 2 ÷ 9'
 # mypro.description='1 ÷ 2 - 1/12 * 24/13'
 # mypro.description = '6 ÷ 12/7 * 2 * 3'
 # mypro.description='13/6 * 1 - 23/15'
 # mypro.description = '5 * 11/7 + 8/13'
-mypro.caculate()
-while (mypro.isValid == False):
-    mypro.isValid = True
+# mypro.description = '9 ÷ 3 - 4/7'
+# mypro.caculate()
+# while (mypro.isValid == False):
+#     mypro.isValid = True
+#     mypro.makeProblem()
+#     mypro.caculate()
+# mypro.description = formatPro(mypro.description)
+
+# print('我生成的问题是', mypro.description, '这个问题的答案是：', mypro.answer, mypro.isValid)
+
+for i in range(0,10):
     mypro.makeProblem()
     mypro.caculate()
-mypro.description = formatPro(mypro.description)
-
-print('我生成的问题是', mypro.description, '这个问题的答案是：', mypro.answer, mypro.isValid)
-
-# myPro = Problem(1,2,3)
-# myPro.makeProblem()
-# myPro.caculate()
-# print(myPro.caculate(),myPro.makeProblem())
+    mypro.description = formatPro(mypro.description)
+    while (mypro.isValid == False):
+        mypro.isValid = True
+        mypro.makeProblem()
+        mypro.caculate()
+    print('我生成的问题是', mypro.description, '这个问题的答案是：', mypro.answer, mypro.isValid)

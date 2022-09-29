@@ -76,13 +76,24 @@ def middle_to_after(s):
     return expression
 
 
-# 把假分数换成带分数
-def change(answer):
-    if (answer > 1):
-        int1 = int(answer)
-        decimal = answer - int1
-        final_Answer = str(int1) + "'" + str(decimal)
-    return final_Answer
+# 把假分数换成带分数 对答案进行格式化
+def formattedAnswer(answer):
+    finalAnswer = answer
+    #答案是浮点数
+    if (isinstance(finalAnswer, float)):
+        if (finalAnswer.is_integer()):
+            # 答案是诸如20.0 30.0的数 把.0去掉
+            finalAnswer = int(answer)
+        else:
+            #答案是诸如3.2 5.6的数 转化成分数
+            finalAnswer = Fraction(answer)
+    #答案是假分数
+    if (finalAnswer > 1):
+        if(isinstance(finalAnswer,Fraction)):
+            int1 = int(answer)
+            decimal = answer - int1
+            finalAnswer = str(int1) + "'" + str(decimal)
+    return finalAnswer
 
 
 # 把问题进行格式化
@@ -94,7 +105,7 @@ def formatPro(question):
         if ('/' in item):
             item = Fraction(item)
             if (item > 1):
-                item = change(item)
+                item = formattedAnswer(item)
     formatted = ''.join(ques)
     finalFormatted = formatted + '='
     return finalFormatted
@@ -122,7 +133,7 @@ class Problem():
         sign = numbers - 1
         print('这个题目里有%d个运算符号' % sign)
         # 随机符号有哪些？
-        signList = ['+', '-', '*', '÷']
+        signList = ['+', '-', '*', '÷','+','*']
         selectedSign = random.sample(signList, sign)
         print("这个运算符号是：", selectedSign)
 
@@ -138,14 +149,31 @@ class Problem():
     # 生成之后self.description = '1+2÷4这种的。'
     # 用来计算答案
     def caculate(self):
+
+        #生成后继表达式
         expression = middle_to_after(self.description)
+
+        #计算答案
         self.answer = self.expression_to_value(expression)
+
+        # 此时说明计算出来的答案不正确，后面的代码不用执行了。
+        if(self.isValid == False):
+            return
+
+        #答案格式化
+        self.answer = formattedAnswer(self.answer)
+
+
+        # 答案有可能是：1.分数 2.浮点数 10.0 3.小数 0.39 or 1.22
+        # 答案只能是：真分数、整数、带分数
         # 把类似11.0 12.0的数转换成整数
-        if (isinstance(self.answer, float)):
-            if (self.answer.is_integer()):
-                self.answer = int(self.answer)
-            else:
-                self.answer = Fraction(self.answer)
+        # if (isinstance(self.answer, float)):
+        #     if (self.answer.is_integer()):
+        #         self.answer = int(self.answer)
+        #     else:
+        #         self.answer = Fraction(self.answer)
+        # if (mypro.answer > 1):
+        # mypro.answer = change(mypro.answer)
 
     # 用来计算答案
 
@@ -170,6 +198,8 @@ class Problem():
                 stack_value.append(item)  # 数值直接压栈.
             else:
                 stack_value.append(int(item))
+        initialAnswer = stack_value[0]
+
         return stack_value[0]
 
     def cal(self, n1, n2, op):
@@ -178,13 +208,18 @@ class Problem():
         if op == '-':
             if (n1 < n2):
                 self.isValid = False
-            return n1 - n2
+                return
+            else:
+                return (n1 - n2)
         if op == '*':
             return n1 * n2
         if op == '÷':
             if (n2 == 0):
                 self.isValid = False
                 return
+            # 如果是整数/整数 应该返回分数
+            elif(n1%n2!=0 and isinstance(n1,int) and isinstance(n2,int)):
+                return (Fraction(n1,n2))
             else:
                 return n1 / n2
 
@@ -192,14 +227,14 @@ class Problem():
 mypro = Problem()
 # 初始化实例的时候.isValid默认是True 调用makeP和caculate后再判断isValid是否为True 如果是说明这个算式符合要求，如果不是要重新调用这两个方法
 mypro.makeProblem()
-# mypro.description='5 ÷ 4 * 2 - 15/8'
+# mypro.description='3/2 * 9/4 - 2 ÷ 6'
+# mypro.description='28/19 + 2 ÷ 9'
+# mypro.description='1 ÷ 2 - 1/12 * 24/13'
 mypro.caculate()
 while (mypro.isValid == False):
     mypro.isValid = True
     mypro.makeProblem()
     mypro.caculate()
-if (mypro.answer > 1):
-    mypro.answer = change(mypro.answer)
 mypro.description = formatPro(mypro.description)
 
 print('我生成的问题是', mypro.description, '这个问题的答案是：', mypro.answer, mypro.isValid)

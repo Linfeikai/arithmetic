@@ -2,7 +2,7 @@ import random
 from fractions import Fraction
 import argparse
 import sys
-
+from datetime import datetime
 ops_rule = {
     '+': 1,
     '-': 1,
@@ -117,6 +117,16 @@ def formatPro(question):
     formatted = ''.join(ques)
     finalFormatted = formatted + '='
     return finalFormatted
+
+#判断对错
+def judgeTrueOrFalse(pro,ans):
+    probl = Problem()
+    probl.description = pro
+    probl.caculate()
+    if(probl.answer == ans):
+        return True
+    else:
+        return False
 
 
 class Problem():
@@ -233,17 +243,21 @@ class Problem():
                 return n1 / n2
 
 
+
 if __name__ =='__main__':
     # 在参数帮助文档之前显示的文本
     parser = argparse.ArgumentParser(description='Read the following instructions.')
     #输入默认是str类型的
     # 可选参数 生成题目数量 默认生成100道
-    parser.add_argument('-n',help="输入生成题目数量(可选)",type=int,default=10)
+    parser.add_argument('-n',help="输入生成题目数量(可选1~10000)",type=int,default=10)
     # 必选参数  题目的数值范围
     parser.add_argument("-r",help="输入数值最大值(>0,必选)",required=True,type=float,default=20)
     args = parser.parse_args()
     if(args.r < 0):
-        print('输入值非法。请重新输入')
+        print('数值最大值(-r)为正值。请重新输入')
+        sys.exit()
+    if(args.n <0 or args.n>10000):
+        print('题目数量(-n)为正值且不大于10000，请重新输入。')
         sys.exit()
 
     numuberOfPro = args.n
@@ -259,18 +273,33 @@ if __name__ =='__main__':
     # mypro.description = '5 * 11/7 + 8/13'
     # mypro.description = '9 ÷ 3 - 4/7'
     # 打开文件
-    with open(file = 'ProList.txt',mode = 'w',encoding='utf-8') as f1:
-        for i in range(0,numuberOfPro):
-            mypro.makeProblem()
-            mypro.caculate()
-            mypro.description = formatPro(mypro.description)
-            while (mypro.isValid == False):
-                '''初始化实例的时候.isValid默认是True 调用makeP和caculate后再判断isValid是否为True 如果是说明这个算式符合要求，
-                    如果不是要重新调用这两个方法'''
-                mypro.isValid = True
+
+    # 这是生成函数
+    with open(file = 'exercise.txt',mode = 'w',encoding='utf-8') as f1:
+        with open(file = 'answer.txt',mode='w',encoding='utf-8') as f2:
+            NowOnTxt = datetime.strftime(datetime.now(), '%y-%m-%d %H:%M:%S')
+            time = str(NowOnTxt)
+            f1.write("题目生成时间：%s\t题目数量：%d\t数值最大范围:%d\n"%(time,numuberOfPro,rangeOfNum))
+            f2.write("答案生成时间：%s\t题目数量：%d\t数值最大范围:%d\n" %(time,numuberOfPro,rangeOfNum))
+            for i in range(0,numuberOfPro):
                 mypro.makeProblem()
                 mypro.caculate()
                 mypro.description = formatPro(mypro.description)
-            pro = str(i+1) + '. ' + mypro.description + '\n'
-            f1.write(pro)
-            print('我生成的问题是', mypro.description, '这个问题的答案是：', mypro.answer, mypro.isValid)
+                while (mypro.isValid == False):
+                    '''初始化实例的时候.isValid默认是True 调用makeP和caculate后再判断isValid是否为True 如果是说明这个算式符合要求，
+                        如果不是要重新调用这两个方法'''
+                    mypro.isValid = True
+                    mypro.makeProblem()
+                    mypro.caculate()
+                    mypro.description = formatPro(mypro.description)
+                pro = str(i+1) + '. ' + mypro.description + '\n'
+                f1.write(pro)
+                ans = str(i+1) + '. ' + str(mypro.answer) + '\n'
+                f2.write(ans)
+
+
+    #判断查重
+    # with open(file = 'exercise.txt',mode = 'r',encoding='utf-8') as f3:
+    #     with open(file = 'answer.txt',mode='r',encoding='utf-8') as f4:
+    #         with open(file = 'Grade.txt',mode = 'w',encoding='utf-8') as f4:
+

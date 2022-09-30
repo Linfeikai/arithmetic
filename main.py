@@ -17,7 +17,7 @@ def generateNum(maxNum):
     a = random.randint(0, 3)
     # 生成整数
     if (a == 0 or a == 3):
-        return (random.randint(0, maxNum))
+        return (random.randint(1, maxNum))
     # 生成小数
     elif (a == 1):
         denominator = random.randint(2, 20)
@@ -236,23 +236,20 @@ class Problem():
 if __name__ =='__main__':
     # 在参数帮助文档之前显示的文本
     parser = argparse.ArgumentParser(description='Read the following instructions.')
-
     #输入默认是str类型的
     # 可选参数 生成题目数量 默认生成100道
     parser.add_argument('-n',help="输入生成题目数量(可选)",type=int,default=10)
     # 必选参数  题目的数值范围
-    parser.add_argument("-r",help="输入数值最大值(>0,必选)",type=float,default=20)
+    parser.add_argument("-r",help="输入数值最大值(>0,必选)",required=True,type=float,default=20)
     args = parser.parse_args()
     if(args.r < 0):
         print('输入值非法。请重新输入')
         sys.exit()
-    print('wwwww')
 
     numuberOfPro = args.n
     rangeOfNum = args.r
-    # print(type(rangeOfNum))
-    # print(rangeOfNum)
-
+    mypro = Problem()
+    mypro.maxNumber = rangeOfNum
     # 帮过我debug的算式们：（谨以注释留念）
     # mypro.description='3/2 * 9/4 - 2 ÷ 6'
     # mypro.description='28/19 + 2 ÷ 9'
@@ -261,17 +258,19 @@ if __name__ =='__main__':
     # mypro.description='13/6 * 1 - 23/15'
     # mypro.description = '5 * 11/7 + 8/13'
     # mypro.description = '9 ÷ 3 - 4/7'
-    mypro = Problem()
-    mypro.maxNumber = rangeOfNum
-    for i in range(0,numuberOfPro):
-        mypro.makeProblem()
-        mypro.caculate()
-        mypro.description = formatPro(mypro.description)
-        while (mypro.isValid == False):
-            '''初始化实例的时候.isValid默认是True 调用makeP和caculate后再判断isValid是否为True 如果是说明这个算式符合要求，
-                如果不是要重新调用这两个方法'''
-            mypro.isValid = True
+    # 打开文件
+    with open(file = 'ProList.txt',mode = 'w',encoding='utf-8') as f1:
+        for i in range(0,numuberOfPro):
             mypro.makeProblem()
             mypro.caculate()
             mypro.description = formatPro(mypro.description)
-        print('我生成的问题是', mypro.description, '这个问题的答案是：', mypro.answer, mypro.isValid)
+            while (mypro.isValid == False):
+                '''初始化实例的时候.isValid默认是True 调用makeP和caculate后再判断isValid是否为True 如果是说明这个算式符合要求，
+                    如果不是要重新调用这两个方法'''
+                mypro.isValid = True
+                mypro.makeProblem()
+                mypro.caculate()
+                mypro.description = formatPro(mypro.description)
+            pro = str(i+1) + '. ' + mypro.description + '\n'
+            f1.write(pro)
+            print('我生成的问题是', mypro.description, '这个问题的答案是：', mypro.answer, mypro.isValid)

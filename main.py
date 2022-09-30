@@ -104,7 +104,6 @@ def formatPro(question):
     # 把问题分开 得到一个list
     ques = question.split(' ')
     # 这个循环把list里的假分数换成带分数
-    #传入引用还是传入地址？
     for i in range(0,len(ques)):
         if ('/' in ques[i]):
             # 把字符串转换成分数
@@ -135,14 +134,13 @@ class Problem():
     def __init__(self, expression=None, isValid=True, answer='', maxNumber = None):
         self.isValid = True
         self.maxNumber = None
-        print('A blank pro has been generated.')
+        # print('A blank pro has been generated.')
 
     # 生成问题
     def makeProblem(self):
         # 随机数字的个数
         numbers = random.randint(2, 4)
         # print('这个题目里有%d个数字' % numbers)
-        # 生成这几个随机数 因为number等于3 所以要执行三次generate函数 把结果放在一个元组里面。
         numList = []
         for i in range(0, numbers):
             numList.append(generateNum(self.maxNumber))
@@ -151,20 +149,17 @@ class Problem():
         # 运算符号的个数等于随机数字个数减一
         sign = numbers - 1
         # print('这个题目里有%d个运算符号' % sign)
-        # 随机符号有哪些？
         signList = ['+', '-', '*', '÷','+','*']
         selectedSign = random.sample(signList, sign)
         # print("这个运算符号是：", selectedSign)
 
-        # 计算结果
         problem = ''
-        # 现在我有两个元组 一个元组里面有n个元素 另一个元组里有n-1个元素 我要把这两个元组的元素依次读出来
         for a in range(0, len(selectedSign)):
             problem = problem + str(numList[a]) + ' ' + selectedSign[a] + ' '
         problem = problem + str(numList[len(numList) - 1])
         # print('我生成的问题是：',problem)
         self.description = problem
-    # 生成之后self.description = '1+2÷4这种的。'
+    # 生成之后self.description = '1+2÷4。'
 
     # 计算答案
     def caculate(self):
@@ -249,9 +244,9 @@ if __name__ =='__main__':
     parser = argparse.ArgumentParser(description='Read the following instructions.')
     #输入默认是str类型的
     # 可选参数 生成题目数量 默认生成100道
-    parser.add_argument('-n',help="输入生成题目数量(可选1~10000)",type=int,default=10)
+    parser.add_argument('-n',help="输入生成题目数量(可选1~10000)",type=int,default=10000)
     # 必选参数  题目的数值范围
-    parser.add_argument("-r",help="输入数值最大值(>0,必选)",required=True,type=float,default=20)
+    parser.add_argument("-r",help="输入数值最大值(>0,必选)",type=float,required=True,default=20)
     args = parser.parse_args()
     if(args.r < 0):
         print('数值最大值(-r)为正值。请重新输入')
@@ -296,7 +291,7 @@ if __name__ =='__main__':
                 f1.write(pro)
                 ans = str(i+1) + '. ' + str(mypro.answer) + '\n'
                 f2.write(ans)
-
+            print('文件已生成。存储在当前文件夹下的exercise.txt以及answer.txt中。')
 
     #判断查重
     # with open(file = 'exercise.txt',mode = 'r',encoding='utf-8') as f3:
